@@ -25,7 +25,7 @@ export function authCookieOptions(): CookieOptions {
   return {
     httpOnly: true, // not readable from JavaScript, so an XSS bug can't steal the session
     sameSite: 'lax', // not sent on cross-site POST/PATCH/DELETE, which blocks CSRF
-    secure: env.isProduction,
+    secure: env.cookieSecure,
     path: '/',
     maxAge: env.sessionTtlSeconds * 1000,
   };

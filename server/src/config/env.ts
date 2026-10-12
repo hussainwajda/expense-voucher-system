@@ -15,6 +15,7 @@ const envSchema = z.object({
   CLIENT_ORIGIN: z.string().default('http://localhost:5173'),
   UPLOAD_DIR: z.string().default('uploads'),
   MAX_UPLOAD_MB: z.coerce.number().positive().max(20).default(2),
+  COOKIE_SECURE: z.enum(['true', 'false']).optional(),
   APP_TIMEZONE: z
     .string()
     .default('Asia/Kolkata')
@@ -41,6 +42,8 @@ export const env = {
   ...raw,
   isProduction: raw.NODE_ENV === 'production',
   isTest: raw.NODE_ENV === 'test',
+  // Secure cookies need HTTPS; defaults to on in production.
+  cookieSecure: raw.COOKIE_SECURE ? raw.COOKIE_SECURE === 'true' : raw.NODE_ENV === 'production',
   uploadDir: resolveFromServerRoot(raw.UPLOAD_DIR),
   maxUploadBytes: Math.round(raw.MAX_UPLOAD_MB * 1024 * 1024),
   sessionTtlSeconds: Math.round(raw.SESSION_TTL_HOURS * 3600),

@@ -1,3 +1,4 @@
+import path from 'node:path';
 import type { Db } from '../../db/pool.js';
 import { pool } from '../../db/pool.js';
 import type { AuthUser, Role } from '../../domain.js';
@@ -27,6 +28,9 @@ function toAuthUser(row: UserRow): AuthUser {
     employeeCode: row.employee_code,
     department: row.department_id ? { id: row.department_id, name: row.department_name ?? '' } : null,
     hasSignature: row.signature_path !== null,
+    signatureUrl: row.signature_path
+      ? `/api/users/me/signature?v=${path.basename(row.signature_path, path.extname(row.signature_path)).slice(0, 8)}`
+      : null,
   };
 }
 

@@ -1,0 +1,22 @@
+# Optional: PostgreSQL in Docker, as an alternative to `npm run db:local`.
+# Serves the same URL as server/.env.example:
+#   postgresql://postgres:postgres@localhost:5433/evms
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: evms
+    ports:
+      - '5433:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d evms']
+      interval: 5s
+      retries: 10
+
+volumes:
+  pgdata:

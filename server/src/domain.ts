@@ -15,4 +15,6 @@ export interface AuthUser {
   employeeCode: string | null;
   department: { id: number; name: string } | null;
   hasSignature: boolean;
+  /** URL of the saved signature image (changes whenever a new one is uploaded), or null. */
+  signatureUrl: string | null;
 }
