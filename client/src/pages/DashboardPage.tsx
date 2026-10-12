@@ -6,7 +6,6 @@ import {
   Clock3,
   FilePlus2,
   Files,
-  IndianRupee,
   Inbox,
   Send,
   Wallet,
@@ -17,6 +16,7 @@ import { useCurrentUser } from '@/auth/AuthProvider';
 import { PageHeader } from '@/components/AppLayout';
 import { StatCard } from '@/components/StatCard';
 import { StatusBadge } from '@/components/StatusBadge';
+import { SummaryHero } from '@/components/SummaryHero';
 import { Alert } from '@/components/ui/Alert';
 import { ButtonLink } from '@/components/ui/Button';
 import { Card, CardHeader } from '@/components/ui/Card';
@@ -52,11 +52,7 @@ export function DashboardPage() {
             <ButtonLink to="/vouchers/new" icon={<FilePlus2 className="size-4" />}>
               New voucher
             </ButtonLink>
-          ) : user.role === 'DIRECTOR' ? (
-            <ButtonLink to="/vouchers/pending" icon={<Inbox className="size-4" />}>
-              Review pending
-            </ButtonLink>
-          ) : (
+          ) : user.role === 'DIRECTOR' ? null : (
             <ButtonLink to="/vouchers?status=APPROVED" variant="secondary" icon={<Files className="size-4" />}>
               Approved vouchers
             </ButtonLink>
@@ -84,10 +80,27 @@ function EmployeeView({ data }: { data: EmployeeDashboard }) {
   const s = data.stats;
   return (
     <div className="space-y-6">
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        <StatCard label="Total amount claimed" value={formatCurrency(s.totalAmountClaimed)} icon={Wallet} tone="brand" emphasis hint={`${formatCurrency(s.approvedAmount)} approved so far`} />
+      <SummaryHero
+        eyebrow="Total amount claimed"
+        value={formatCurrency(s.totalAmountClaimed)}
+        caption="Everything you have submitted for reimbursement (drafts excluded)."
+        facts={[
+          { label: 'Approved', value: formatCurrency(s.approvedAmount) },
+          { label: 'Vouchers awaiting a decision', value: s.pendingApproval },
+        ]}
+        breakdown={{
+          title: 'Your vouchers by status',
+          segments: [
+            { label: 'Draft', value: s.draftVouchers, color: 'bg-slate-400', to: '/vouchers?status=DRAFT' },
+            { label: 'Pending', value: s.pendingApproval, color: 'bg-amber-400', to: '/vouchers?status=PENDING_APPROVAL' },
+            { label: 'Approved', value: s.approvedVouchers, color: 'bg-emerald-400', to: '/vouchers?status=APPROVED' },
+            { label: 'Rejected', value: s.rejectedVouchers, color: 'bg-rose-400', to: '/vouchers?status=REJECTED' },
+          ],
+        }}
+      />
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-5">
         <StatCard label="Total vouchers" value={s.totalVouchers} icon={Files} to="/vouchers" />
-        <StatCard label="Drafts" value={s.draftVouchers} icon={CircleDashed} to="/vouchers?status=DRAFT" hint="Not yet submitted" />
+        <StatCard label="Drafts" value={s.draftVouchers} icon={CircleDashed} to="/vouchers?status=DRAFT" />
         <StatCard label="Pending approval" value={s.pendingApproval} icon={Clock3} tone="amber" to="/vouchers?status=PENDING_APPROVAL" />
         <StatCard label="Approved" value={s.approvedVouchers} icon={CheckCircle2} tone="emerald" to="/vouchers?status=APPROVED" />
         <StatCard label="Rejected" value={s.rejectedVouchers} icon={XCircle} tone="rose" to="/vouchers?status=REJECTED" />
@@ -113,11 +126,39 @@ function DirectorView({ data }: { data: DirectorDashboard }) {
   const s = data.stats;
   return (
     <div className="space-y-6">
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <SummaryHero
+        eyebrow="Total pending amount"
+        value={formatCurrency(s.totalPendingAmount)}
+        caption={
+          s.pendingApproval
+            ? `${s.pendingApproval} voucher${s.pendingApproval === 1 ? '' : 's'} waiting for your decision.`
+            : 'Nothing is waiting for your decision.'
+        }
+        action={
+          s.pendingApproval > 0 && (
+            <Link
+              to="/vouchers/pending"
+              className="inline-flex h-10 items-center gap-2 rounded-lg bg-white px-4 text-sm font-semibold text-slate-900 transition-colors hover:bg-brand-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+            >
+              <Inbox className="size-4" aria-hidden="true" /> Review pending
+            </Link>
+          )
+        }
+        breakdown={{
+          title: 'Today at a glance',
+          segments: [
+            { label: 'Pending', value: s.pendingApproval, color: 'bg-amber-400', to: '/vouchers/pending' },
+            { label: 'Approved today', value: s.approvedToday, color: 'bg-emerald-400' },
+            { label: 'Rejected today', value: s.rejectedToday, color: 'bg-rose-400' },
+          ],
+        }}
+      />
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
         <StatCard label="Pending approval" value={s.pendingApproval} icon={Clock3} tone="amber" to="/vouchers/pending" hint="Waiting for your decision" />
-        <StatCard label="Total pending amount" value={formatCurrency(s.totalPendingAmount)} icon={IndianRupee} tone="brand" />
         <StatCard label="Approved today" value={s.approvedToday} icon={CheckCircle2} tone="emerald" />
-        <StatCard label="Rejected today" value={s.rejectedToday} icon={XCircle} tone="rose" />
+        <div className="col-span-2 lg:col-span-1">
+          <StatCard label="Rejected today" value={s.rejectedToday} icon={XCircle} tone="rose" />
+        </div>
       </div>
       <div className="grid gap-6 xl:grid-cols-5">
         <Card className="xl:col-span-3">
@@ -145,10 +186,24 @@ function AccountsView({ data }: { data: AccountsDashboard }) {
   const s = data.stats;
   return (
     <div className="space-y-6">
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
-        <div className="sm:col-span-2 xl:col-span-1">
-          <StatCard label="Total approved amount" value={formatCurrency(s.totalApprovedAmount)} icon={Wallet} tone="brand" emphasis hint="Ready for reimbursement" />
-        </div>
+      <SummaryHero
+        eyebrow="Total approved amount"
+        value={formatCurrency(s.totalApprovedAmount)}
+        caption="Approved by the Director and ready for reimbursement."
+        facts={[
+          { label: 'Approved vouchers', value: s.approvedVouchers },
+          { label: 'Submitted vouchers', value: s.totalVouchers },
+        ]}
+        breakdown={{
+          title: 'Submitted vouchers by status',
+          segments: [
+            { label: 'Pending', value: s.pendingApproval, color: 'bg-amber-400', to: '/vouchers?status=PENDING_APPROVAL' },
+            { label: 'Approved', value: s.approvedVouchers, color: 'bg-emerald-400', to: '/vouchers?status=APPROVED' },
+            { label: 'Rejected', value: s.rejectedVouchers, color: 'bg-rose-400', to: '/vouchers?status=REJECTED' },
+          ],
+        }}
+      />
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard label="Total vouchers" value={s.totalVouchers} icon={Files} to="/vouchers" hint="Submitted across the organisation" />
         <StatCard label="Pending approval" value={s.pendingApproval} icon={Clock3} tone="amber" to="/vouchers?status=PENDING_APPROVAL" />
         <StatCard label="Approved" value={s.approvedVouchers} icon={CheckCircle2} tone="emerald" to="/vouchers?status=APPROVED" />

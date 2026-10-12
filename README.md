@@ -2,7 +2,18 @@
 
 A web app that replaces ABC Company's paper expense vouchers. **Employees** create and sign vouchers, the **Director** approves (with a signature) or rejects (with a reason), and the **Accounts Team** sees every voucher for reimbursement processing.
 
+**Repository:** https://github.com/hussainwajda/expense-voucher-system
+
 **Stack:** React 19 + TypeScript + Vite + Tailwind CSS · Node.js + Express 5 + TypeScript · PostgreSQL · JWT (httpOnly cookie) · Zod validation · Vitest + Supertest
+
+## Screenshots
+
+| | |
+| --- | --- |
+| ![Login](docs/screenshots/01-login.jpg) | ![Employee dashboard](docs/screenshots/02-employee-dashboard.jpg) |
+| ![New voucher](docs/screenshots/03-new-voucher-form.jpg) | ![Rejected voucher](docs/screenshots/04-rejected-voucher-detail.jpg) |
+| ![Director dashboard](docs/screenshots/05-director-dashboard.jpg) | ![Approve dialog](docs/screenshots/06-director-approve-dialog.jpg) |
+| ![Accounts dashboard](docs/screenshots/07-accounts-dashboard.jpg) | ![Filtered list](docs/screenshots/08-accounts-filtered-list.jpg) |
 
 ---
 
