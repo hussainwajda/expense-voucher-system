@@ -1,0 +1,26 @@
+{
+  "name": "expense-voucher-system",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Expense Voucher Management System: employees raise vouchers, the Director approves or rejects them, Accounts processes reimbursements.",
+  "workspaces": [
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "db:local": "npm --prefix server run db:local",
+    "db:migrate": "npm --prefix server run db:migrate",
+    "db:seed": "npm --prefix server run db:seed",
+    "dev": "concurrently -n server,client -c blue,magenta \"npm --prefix server run dev\" \"npm --prefix client run dev\"",
+    "build": "npm --prefix server run build && npm --prefix client run build",
+    "start": "npm --prefix server run start",
+    "test": "npm --prefix server run test",
+    "typecheck": "npm --prefix server run typecheck && npm --prefix client run typecheck"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  },
+  "engines": {
+    "node": ">=20.19"
+  }
+}

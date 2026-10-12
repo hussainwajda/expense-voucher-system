@@ -1,0 +1,13 @@
+packages:
+  - server
+  - client
+
+# Packages allowed to run install scripts (pnpm blocks them by default).
+# embedded-postgres ships the PostgreSQL binaries used by `pnpm db:local` and the test suite.
+allowBuilds:
+  esbuild: true
+  '@embedded-postgres/darwin-arm64': true
+  '@embedded-postgres/darwin-x64': true
+  '@embedded-postgres/linux-x64': true
+  '@embedded-postgres/linux-arm64': true
+  '@embedded-postgres/windows-x64': true
